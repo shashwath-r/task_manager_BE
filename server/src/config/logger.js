@@ -1,9 +1,11 @@
 // utils/logger.js
 const { createLogger, format, transports } = require("winston");
+const path = require("path");
 
 const devFormat = format.combine(
-  format.colorize(), // adds colors
+  format.colorize(),
   format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  format.errors({ stack: true }), // 👈 capture error stack
   format.printf(({ timestamp, level, message, stack }) => {
     return stack
       ? `[${timestamp}] [${level}] ${message} - ${stack}`
@@ -13,7 +15,8 @@ const devFormat = format.combine(
 
 const prodFormat = format.combine(
   format.timestamp(),
-  format.json() // JSON format for production
+  format.errors({ stack: true }), // 👈 important for prod too
+  format.json()
 );
 
 const logger = createLogger({
@@ -21,8 +24,13 @@ const logger = createLogger({
   format: process.env.NODE_ENV === "production" ? prodFormat : devFormat,
   transports: [
     new transports.Console(),
-    new transports.File({ filename: "logs/error.log", level: "error" }),
-    new transports.File({ filename: "logs/combined.log" }),
+    new transports.File({
+      filename: path.join(__dirname, "../logs/error.log"),
+      level: "error",
+    }),
+    new transports.File({
+      filename: path.join(__dirname, "../logs/combined.log"),
+    }),
   ],
 });
 

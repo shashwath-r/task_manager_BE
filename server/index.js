@@ -26,7 +26,7 @@ const runServer = async () => {
   try {
     await connectDB(); // ensure DB is connected first
     app.listen(PORT, () => {
-      logger.info("🚀 App listening on port", PORT);
+      logger.info(`🚀 App listening on port ${PORT}`);
     });
   } catch (err) {
     logger.error("❌ Failed to connect to DB", err.message);
